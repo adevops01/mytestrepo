@@ -1,4 +1,8 @@
 {
+"account_id": "myaccount_id",
+"role_name": "myrole_name",
+"region": "my_region_name",
+"action": "stauts",
 "resources": {
     "ec2": [
         { "ec2": "myec2-01" },
