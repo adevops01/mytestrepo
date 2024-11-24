@@ -1,0 +1,16 @@
+{
+"resources": {
+    "ec2": [
+        { "ec2": "myec2-01" },
+        { "ec2": "myec2-02" },
+        { "ec2": "myec2-03" },
+        { "ec2": "myec2-04" }
+    ],
+    "rds": [
+        { "id": "aurora-sql" }
+    ],
+    "docdb": [
+        { "id": "aurora-sql" }
+    ]
+    }
+}
