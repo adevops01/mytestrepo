@@ -1,0 +1,209 @@
+security:
+  caCerts:
+    rootCA.pem: |
+      -----BEGIN CERTIFICATE-----
+      MIIEfTCCAuWgAwIBAgIQTmdKaOqy6Ncj0Rfx0R4RMTANBgkqhkiG9w0BAQsFADBX
+      MR4wHAYDVQQKExVta2NlcnQgZGV2ZWxvcG1lbnQgQ0ExFjAUBgNVBAsMDXNoYWhh
+      YkB1YnVudHUxHTAbBgNVBAMMFG1rY2VydCBzaGFoYWJAdWJ1bnR1MB4XDTI1MDUy
+      NTA3MDgxOFoXDTM1MDUyNTA3MDgxOFowVzEeMBwGA1UEChMVbWtjZXJ0IGRldmVs
+      b3BtZW50IENBMRYwFAYDVQQLDA1zaGFoYWJAdWJ1bnR1MR0wGwYDVQQDDBRta2Nl
+      cnQgc2hhaGFiQHVidW50dTCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGB
+      ALrUZcJVfaNbyT0X/mSOcq2n98qL81tSN05Ugg+3R6d9SHsRFT+l6lE22hj2QEHN
+      KY3HXX/pv+ftupbcaktaIlx+k1Iw1eCRP2jAr14YkApDu7OY0ju6AH5HeYczcEv/
+      JPrPYrr3ONcS+3LnkbjpBs7Z5hMkka2A70C6kQ52DoMMt0qp6YoBnkKKgcobMaA1
+      nygLvId87pFcPXouo9x/R1PpSCLe3Iixe3UY6kHMgBg7G1XAo/90nPUpQuTs6i2d
+      dyseW5FmRWsGMObEUcfjnpd08rlS6QOuKc0804FbDFKy83hmoKda2oIs7nKM9kAa
+      zIbSBH83KetW+rfPSyZZ+zQDJP1DyGQRT0cPXZNAYga4hEf/uge8rFyATtIpTwiF
+      ManOQanTNiGnKR5minTguaE2qwPlV794PDc/nlLI9sOlzylpGNdVIVCNN/tXgHGM
+      I4LhZ0D3/V+d67DXuXtKyQYTyzKef5PCIWloUr+kcuPxb4Lv0txbKaacCSSdsn/t
+      bwIDAQABo0UwQzAOBgNVHQ8BAf8EBAMCAgQwEgYDVR0TAQH/BAgwBgEB/wIBADAd
+      BgNVHQ4EFgQUKu6JEtmtjYSBVUuL56b0pl1ZPNIwDQYJKoZIhvcNAQELBQADggGB
+      AF2nCTAjlzqNCQsgB/5Ra3n9ZAVS5w1QWDEqYyHSxEbOScTzBMBFUW11J8491aST
+      aK/DK0TMKDTFFzrvydX2lGLcRlTw+b2LX0iV3OfAS7pQBAwSh4TII3Zl0yttfVY4
+      mNcy5cSBZYgOscpkNttpnC26JP0a8qKCKUZ2ur46ptjqs2a33gulyau6qQ0yeszE
+      MTy8y4hQMo5/95ua1mwg0JUP4m0V/+pTVEQNAXZLzq5cQ1gBKFC5uwNJQ94TBL7V
+      AGvUlCmr2HlmuWoBJnTjR//dxqs3Tn0vX2r9CIJooHV2WNnnmKQIRM3hiVmU/0Za
+      ngJU2cYA5YzpuXV2LaFrB0kH4/+9kGdTOJFRJCTmHr8feupdLirnVEyYXdVFxER1
+      LGK/7KXz2+JVV/jRjpM52p63B1Ie81QmJrMt7rTEcxwn4AjerXm6FC/niDsI6tIF
+      r8qyTt1ixt3CsxJ1ZsQfgK7nUbo774VTq86HyszJxGNux72TocFTKxw3qQ69Wh3s
+      wA==
+      -----END CERTIFICATE-----
+
+## API properties
+api:
+  env:
+  - name: SERVICE_BINDING_ROOT
+    value: /mnt/platform/bindings
+  volumes:
+    - name: ca-certs
+      secret:
+        secretName: terrakube-ca-secrets
+        items:
+        - key: "rootCA.pem"
+          path: "rootCA.pem"
+        - key: "type"
+          path: "type"
+  volumeMounts:
+  - name: ca-certs
+    mountPath: /mnt/platform/bindings/ca-certificates
+    readOnly: true
+  properties:
+    databaseType: "H2"
+
+executor:
+  env:
+  - name: SERVICE_BINDING_ROOT
+    value: /mnt/platform/bindings
+  volumes:
+    - name: ca-certs
+      secret:
+        secretName: terrakube-ca-secrets
+        items:
+        - key: "rootCA.pem"
+          path: "rootCA.pem"
+        - key: "type"
+          path: "type"
+  volumeMounts:
+  - name: ca-certs
+    mountPath: /mnt/platform/bindings/ca-certificates
+    readOnly: true
+
+## Registry properties
+registry:
+  enabled: true
+  replicaCount: "1"
+  serviceType: "ClusterIP"
+  env:
+  - name: SERVICE_BINDING_ROOT
+    value: /mnt/platform/bindings
+  volumes:
+    - name: ca-certs
+      secret:
+        secretName: terrakube-ca-secrets
+        items:
+        - key: "rootCA.pem"
+          path: "rootCA.pem"
+        - key: "type"
+          path: "type"
+  volumeMounts:
+  - name: ca-certs
+    mountPath: /mnt/platform/bindings/ca-certificates
+    readOnly: true
+
+dex:
+  config:
+    issuer: https://terrakube-api.minikube.net/dex
+
+    storage:
+      type: memory
+    web:
+      http: 0.0.0.0:5556
+      allowedOrigins: ['*']
+      skipApprovalScreen: true
+    oauth2:
+      responseTypes: ["code", "token", "id_token"]
+
+    connectors:
+    - type: ldap
+      name: OpenLDAP
+      id: ldap
+      config:
+        # The following configurations seem to work with OpenLDAP:
+        #
+        # 1) Plain LDAP, without TLS:
+        host: terrakube-openldap-service:1389
+        insecureNoSSL: true
+        #
+        # 2) LDAPS without certificate validation:
+        #host: localhost:636
+        #insecureNoSSL: false
+        #insecureSkipVerify: true
+        #
+        # 3) LDAPS with certificate validation:
+        #host: YOUR-HOSTNAME:636
+        #insecureNoSSL: false
+        #insecureSkipVerify: false
+        #rootCAData: 'CERT'
+        # ...where CERT="$( base64 -w 0 your-cert.crt )"
+
+        # This would normally be a read-only user.
+        bindDN: cn=admin,dc=example,dc=org
+        bindPW: admin
+
+        usernamePrompt: Email Address
+
+        userSearch:
+          baseDN: ou=users,dc=example,dc=org
+          filter: "(objectClass=person)"
+          username: mail
+          # "DN" (case sensitive) is a special attribute name. It indicates that
+          # this value should be taken from the entity's DN not an attribute on
+          # the entity.
+          idAttr: DN
+          emailAttr: mail
+          nameAttr: cn
+
+        groupSearch:
+          baseDN: ou=Groups,dc=example,dc=org
+          filter: "(objectClass=groupOfNames)"
+
+          userMatchers:
+            # A user is a member of a group when their DN matches
+            # the value of a "member" attribute on the group entity.
+          - userAttr: DN
+            groupAttr: member
+
+          # The group name should be the "cn" value.
+          nameAttr: cn
+
+    staticClients:
+    - id: example-app
+      redirectURIs:
+      - 'https://terrakube-ui.minikube.net'
+      - '/device/callback'
+      - 'http://localhost:10000/login'
+      - 'http://localhost:10001/login'
+      name: 'example-app'
+      public: true
+
+
+## Ingress properties
+ingress:
+  useTls: true
+  includeTlsHosts: true
+  ui:
+    enabled: true
+    domain: "terrakube-ui.minikube.net"
+    path: "/"
+    pathType: "Prefix"
+    tlsSecretName: tls-secret-ui-terrakube
+    ingressClassName: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+  api:
+    enabled: true
+    domain: "terrakube-api.minikube.net"
+    path: "/"
+    pathType: "Prefix"
+    tlsSecretName: tls-secret-api-terrakube
+    ingressClassName: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/proxy-set-headers: "terrakube/custom-headers"
+  registry:
+    enabled: true
+    domain: "terrakube-reg.minikube.net"
+    path: "/"
+    pathType: "Prefix"
+    tlsSecretName: tls-secret-reg-terrakube
+    ingressClassName: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/proxy-set-headers: "terrakube/custom-headers"
+  dex:
+    enabled: true
+    path: "/dex/"
+    pathType: "Prefix"
+    annotations:
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/proxy-set-headers: "terrakube/custom-headers"
