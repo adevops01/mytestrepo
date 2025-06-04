@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: terraform-workflow
+spec:
+  entrypoint: main
+  templates:
+    - name: main
+      steps:
+        - - name: plan
+            template: plan
+        - - name: apply
+            template: apply
+            inputs:
+              parameters:
+                - name: tfplan
+                  valueFrom:
+                    path: plan.outputs.tfplan
+    - name: plan
+      container:
+        image: "hashicorp/terraform:latest"
+        command: ["terraform", "init", "-input=false", "-refresh=false", "--upgrade"]
+        volumeMounts:
+          - name: git-pvc
+            mountPath: /mnt/repo
+        args: [ "/mnt/repo" ] # Assuming your Terraform files are in /mnt/repo
+        # Add other necessary Terraform commands like "plan" here
+    - name: apply
+      container:
+        image: "hashicorp/terraform:latest"
+        volumeMounts:
+          - name: git-pvc
+            mountPath: /mnt/repo
+        command: ["terraform", "apply", "-input=false"] # Use -input=false for automation
+        args: ["-auto-approve", "/mnt/repo"]
+        # Add the Terraform plan file here
